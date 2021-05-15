@@ -1,0 +1,27 @@
+{
+  "name": "Keeptrack-server",
+  "version": "1.0.0",
+  "description": "Express Server for Gentle Ben's",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stacyburris/Keeptrack-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stacyburris/Keeptrack-server/issues"
+  },
+  "homepage": "https://github.com/stacyburris/Keeptrack-server#readme",
+  "dependencies": {
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "http": "^0.0.1-security",
+    "socket.io": "^4.1.1"
+  }
+}
