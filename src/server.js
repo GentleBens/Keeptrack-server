@@ -8,6 +8,10 @@ require('./models/counter');
 const mongoose = require('mongoose');
 const Counter = mongoose.model('counter');
 
+//var counter = 0
+// track
+//var dailyTotal = 0 
+// update
 
 // middleware
  const notFound = require('./error-handlers/404');
