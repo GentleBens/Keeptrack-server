@@ -8,9 +8,17 @@ require('./models/counter');
 const mongoose = require('mongoose');
 const Counter = mongoose.model('counter');
 
-//var counter = 0
+
+let server = require('http').createServer(app); 
+let io = require('socket.io')(server);
+//httpServer.listen(process.env.PORT) 
+
+//keep track of how many times a bouncer clicks button
+var counter = 0;
+console.log('inside the server page counter', counter);
+//var socket = io.connect();
 // track
-//var dailyTotal = 0 
+//var dailyTotal = 0; 
 // update
 
 // middleware
@@ -28,6 +36,34 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
+
+//let counter = 0;
+io.on('connection', (socket) => {
+  console.log('A bouncer connected:');
+  socket.emit('setCounter', { counter: counter });
+
+  socket.on('disconnect', () => {
+    console.log('Disconnected: ' + socket); //socket.id
+  });
+
+  socket.on('increment', (data) => {
+    counter++;
+    socket.emit('setCounter', { counter: counter });
+  });
+  socket.on('decrement', (data) => {
+    counter--;
+    socket.emit('setCounter', { counter: counter });
+  })
+})
+
+
+// io.on('connection', (socket) => {
+//   console.log('A bouncer connected:');
+//   socket.on('joinRoom', (room) => {
+//     socket.join(room);
+//     console.log('A bouncer joined counter room: ' + room);
+//   });
+// });
 
 
 
