@@ -40,7 +40,7 @@ app.use(logger);   // console.log() routes and methods
 //let counter = 0;
 io.on('connection', (socket) => {
   console.log('A bouncer connected:');
-  socket.emit('setCounter', { counter: counter });
+  socket.emit('connection', { counter: counter });
 
   socket.on('disconnect', () => {
     console.log('Disconnected: ' + socket); //socket.id
@@ -48,11 +48,11 @@ io.on('connection', (socket) => {
 
   socket.on('increment', (data) => {
     counter++;
-    socket.emit('setCounter', { counter: counter });
+    socket.emit('increment', { counter: counter });
   });
   socket.on('decrement', (data) => {
     counter--;
-    socket.emit('setCounter', { counter: counter });
+    socket.emit('decrement', { counter: counter });
   })
 })
 
