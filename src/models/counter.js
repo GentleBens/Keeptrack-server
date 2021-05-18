@@ -3,8 +3,10 @@
 const mongoose = require('mongoose');
 const counterSchema = new mongoose.Schema({
     counter: {type: Number, required: true},
-    graph: {type: Number, required: false},
-    
-  })
+    Date: { type: Date, require: true},
+  },
+  {
+    timestamps: true,
+  });
 
 module.exports = mongoose.model('counter', counterSchema); 
