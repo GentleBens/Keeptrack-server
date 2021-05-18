@@ -9,9 +9,6 @@ console.log('made it to the apiRoutes page');
 console.log('this is the collection', Collection);
 console.log('this is the counter', counter);
 
-
-console.log('Made it to API routes page!');
-
 router.get('/', handleGetAll);
 router.get('/:id', handleGetOne);
 router.post('/', handleAdd);
