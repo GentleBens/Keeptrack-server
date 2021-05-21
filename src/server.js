@@ -37,6 +37,10 @@ app.use(express.urlencoded({extended: true}));
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
 
+
+
+
+
 //let counter = 0;
 io.on('connection', (socket) => {
   console.log('A bouncer connected:');
