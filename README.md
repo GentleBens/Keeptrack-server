@@ -14,4 +14,8 @@ PORT=3000
 
 ## Deployed React Native Frontend
 
-- []()
+- [Expo go Project](https://expo.io/@stacyjane/keeptrack-gentlebens)
+
+Contributions:
+
+[JP Jones](https://github.com/4a50)
