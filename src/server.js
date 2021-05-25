@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express'); //express server
-const app = express(); 
+const app = express();
 const cors = require('cors'); //allow cors
 const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const Counter = mongoose.model('counter');
 
 
-let server = require('http').createServer(app); 
+let server = require('http').createServer(app);
 //let io = require('socket.io')(server);
 //httpServer.listen(process.env.PORT) 
 
@@ -22,17 +22,17 @@ console.log('inside the server page counter', counter);
 // update
 
 // middleware
- const notFound = require('./error-handlers/404');
- const serverError = require('./error-handlers/500');
- const apiRoutes = require('./routes/apiRoutes.js');
- const logger = require('./middleware/logger');
+const notFound = require('./error-handlers/404');
+const serverError = require('./error-handlers/500');
+const apiRoutes = require('./routes/apiRoutes.js');
+const logger = require('./middleware/logger');
 
 //app middleware
 app.use(cors());
 app.use(morgan('dev'));
 
 app.use(express.json());  //turns the req.body into json
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
@@ -48,13 +48,13 @@ app.use(logger);   // console.log() routes and methods
 
 // determine if table exist for current date if not make a new table for that date
 // let doesTableExist = async (desiredDate) => {
-  
+
 //  //let currentDate = new Date();
 //   // let daily = dailyTotal.date.getDate();
 
 //   let allRecords = await Counter.find().exec() // everything in db
 //     for(let i = 0; i < allRecords.length; i++) {
-   
+
 //       if(desiredDate === allRecords[i].dailyTotal.date.getDate())
 //       console.log('Record located');
 //       return true;
@@ -127,14 +127,14 @@ app.use(serverError); //500 error when something throws an error
 
 
 module.exports = {
-    server: app,
-    start: PORT => {
-      if (!PORT) { throw new Error('No PORT here'); }
-      app.listen(PORT, () => {
-        console.log(`super connected ${PORT}`);
-      });
-    },
-  };
+  server: app,
+  start: PORT => {
+    if (!PORT) { throw new Error('No PORT here'); }
+    app.listen(PORT, () => {
+      console.log(`super connected ${PORT}`);
+    });
+  },
+};
 
 
 // let server = require('http').createServer(app);
@@ -144,4 +144,33 @@ module.exports = {
 //     console.log('a user connected');
 //   });
 
+async function getAll() {
+  return Counter.find()
+    .then((data) => data)
+    .catch(e => { console.log(e) });
+}
 
+
+async function printData(desiredDate) {
+  let dbase = await getAll();
+  //console.log(dbase[0]);
+  for (let i = 0; i < dbase.length; i++) {
+    let dbaseDate = dbase[i].dailyTotal.date.getDate();
+    if (desiredDate === dbaseDate) {
+      console.log('found it');
+      return true;
+    }
+  }
+  console.log('no find it');
+  return false;
+}
+function callBackHandler(req, res, next) {
+  res.status(200).send('Hello World');
+}
+
+var boolStuff = '123';
+console.log(`umm ${boolStuff}`);
+boolStuff = printData(27);
+console.log(`umm ${boolStuff}`);
+
+console.log(typeof (boolStuff));
