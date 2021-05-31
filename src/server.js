@@ -7,7 +7,7 @@ const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
 const mongoose = require('mongoose');
 const Counter = mongoose.model('counter');
-
+const SimpleCounter = mongoose.model('simpleCounter');
 
 let server = require('http').createServer(app);
 //let io = require('socket.io')(server);
@@ -146,7 +146,7 @@ function callBackHandler(req, res, next) {
 }
 //JPJ - This sill get all the documents in the database
 async function getAll() {
-  return Counter.find()
+  return SimpleCounter.find()
     .then((data) => data)
     .catch(e => { console.log(`Error Found: ${e}`) });
 }
@@ -154,12 +154,9 @@ async function getAll() {
 async function addDailyTotalData(desDate, count) {
   let entryDate = new Date();
   entryDate = desDate;
-  Counter.create({
-    counter: 0,
-    dailyTotal: {
-      date: entryDate,
-      numberCount: count
-    }
+  SimpleCounter.create({
+    date: entryDate,
+    numberCount: count
   }, function (err) {
     if (err) return handleError(err);
     console.log('Entry Saved');
@@ -169,9 +166,9 @@ async function addDailyTotalData(desDate, count) {
 async function printAllDbData() {
   let dbase = await getAll();
   dbase.forEach(i => {
-    let formattedDate = `${i.dailyTotal.date.getMonth()}/${i.dailyTotal.date.getDate()}/${i.dailyTotal.date.getFullYear()}`;
-    console.log(`Date: ${formattedDate} Count: ${i.dailyTotal.numberCount}`);
-    console.log(`Full Format ${i.dailyTotal.date}}`);
+    let formattedDate = `${i.date.getMonth()}/${i.date.getDate()}/${i.date.getFullYear()}`;
+    console.log(`Date: ${formattedDate} Count: ${i.numberCount}`);
+    console.log(`Full Format ${i.date}}`);
   });
 }
 
@@ -182,22 +179,33 @@ async function printAllDbData() {
 //  numberCount: {type: Number, require: false},  
 //});
 // Would make it easier to scan non nested documents.
+async function bombTheDatabase() {
+  await SimpleCounter.deleteMany({});
+  await seedDatabase();
 
+  console.log('Database Slicked and Seeded');
+}
 async function findDbDocument(searchDate) {
   let countNum = 200;
   console.log(`Date to search: ${searchDate}`);
   console.log(`CountNumber: ${countNum}`);
-  let data = await Counter.findOne({ dailyTotal: { numberCount = 200 } }).exec();
-  console.log(`Data: ${data}`);
+  let data = await SimpleCounter.findOne({ date: searchDate }).exec();
+  console.log(`Data: ${data.date} ${data.numberCount}`);
 }
 //TODO: Create a function to find and update or create the document for the totals for the day if the save totals is pressed
 //this will reset the counter held in memory so as not to distort the total daily count.
 
 //Execution lines
-
+async function seedDatabase() {
+  let dateArr = ['5/28/2021', '5/29/2021', '5/30/2021', '5/31/2021'];
+  let counter = 5;
+  dateArr.forEach(d => addDailyTotalData(d, counter += 5));
+}
 printAllDbData();
-let searchDate = new Date('5/31/2021');
 
-findDbDocument(searchDate);
+//addDailyTotalData('5/29/2021');
+let searchDate = new Date('5/30/2021');
+//bombTheDatabase();
+//findDbDocument(searchDate);
 
 
