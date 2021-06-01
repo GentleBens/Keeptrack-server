@@ -27,6 +27,7 @@ const serverError = require('./error-handlers/500');
 const apiRoutes = require('./routes/apiRoutes.js');
 const logger = require('./middleware/logger');
 const { Console } = require('console');
+const { findByIdAndUpdate } = require('./models/counter');
 
 //app middleware
 app.use(cors());
@@ -190,22 +191,58 @@ async function findDbDocument(searchDate) {
   console.log(`Date to search: ${searchDate}`);
   console.log(`CountNumber: ${countNum}`);
   let data = await SimpleCounter.findOne({ date: searchDate }).exec();
-  console.log(`Data: ${data.date} ${data.numberCount}`);
+  console.log(data);
+  //will return null if no record found.  
+  return data;
 }
-//TODO: Create a function to find and update or create the document for the totals for the day if the save totals is pressed
-//this will reset the counter held in memory so as not to distort the total daily count.
-
-//Execution lines
 async function seedDatabase() {
   let dateArr = ['5/28/2021', '5/29/2021', '5/30/2021', '5/31/2021'];
   let counter = 5;
   dateArr.forEach(d => addDailyTotalData(d, counter += 5));
 }
+
+//This will determine if there is a record for the updated totals.  if true it will add to the total already stored.  if false it will create a new record and add the counter then reset it.
+async function updateDailyTotals() {
+  let date = new Date();
+  let dateString = `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+  console.log(dateString);
+  //TODO: find a more eloquent way to search for just the date
+  let record = await findDbDocument(dateString);
+  if (record === null) {
+    console.log("No Record Exists.  Creating a new record and updating totals.");
+    addDailyTotalData(dateString, counter);
+
+  }
+  else {
+    let totalCount = counter + record.numberCount;
+    console.log(`Aggregate total going into document: counter: ${counter} recordCount: ${record.numberCount} = ${totalCount}`);
+    console.log(`Updating the following ${record.date} using id: ${record.id}`);
+
+    await SimpleCounter.findByIdAndUpdate(record._id, {
+      date: Date.parse(dateString),
+      numberCount: record.numberCount + counter
+    });
+  }
+  counter = 0;
+}
+
+
+
+//Execution lines
+
+
 printAllDbData();
 
 //addDailyTotalData('5/29/2021');
-let searchDate = new Date('5/30/2021');
+//let searchDate = new Date('5/30/2021');
 //bombTheDatabase();
+//counter = 20;
+//console.log(`Counter: ${counter}`);
+
+//updateDailyTotals();
+//console.log(`Counter: ${counter}`);
 //findDbDocument(searchDate);
+
+
 
 
