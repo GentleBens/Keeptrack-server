@@ -1,15 +1,15 @@
 'use strict';
 
 const express = require('express'); //express server
-const app = express(); 
+const app = express();
 const cors = require('cors'); //allow cors
 const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
 const mongoose = require('mongoose');
 const Counter = mongoose.model('counter');
+const SimpleCounter = mongoose.model('simpleCounter');
 
-
-let server = require('http').createServer(app); 
+let server = require('http').createServer(app);
 //let io = require('socket.io')(server);
 //httpServer.listen(process.env.PORT) 
 
@@ -22,17 +22,19 @@ console.log('inside the server page counter', counter);
 // update
 
 // middleware
- const notFound = require('./error-handlers/404');
- const serverError = require('./error-handlers/500');
- const apiRoutes = require('./routes/apiRoutes.js');
- const logger = require('./middleware/logger');
+const notFound = require('./error-handlers/404');
+const serverError = require('./error-handlers/500');
+const apiRoutes = require('./routes/apiRoutes.js');
+const logger = require('./middleware/logger');
+const { Console } = require('console');
+const { findByIdAndUpdate } = require('./models/counter');
 
 //app middleware
 app.use(cors());
 app.use(morgan('dev'));
 
 app.use(express.json());  //turns the req.body into json
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
@@ -48,13 +50,13 @@ app.use(logger);   // console.log() routes and methods
 
 // determine if table exist for current date if not make a new table for that date
 // let doesTableExist = async (desiredDate) => {
-  
+
 //  //let currentDate = new Date();
 //   // let daily = dailyTotal.date.getDate();
 
 //   let allRecords = await Counter.find().exec() // everything in db
 //     for(let i = 0; i < allRecords.length; i++) {
-   
+
 //       if(desiredDate === allRecords[i].dailyTotal.date.getDate())
 //       console.log('Record located');
 //       return true;
@@ -85,11 +87,6 @@ async function printData(desiredDate) {
   console.log('no find it');
   return false;
 }
-console.log(printData(21).toString());
-
-
-
-
 // add to socket.io server
 //let counter = 0;
 // io.on('connection', (socket) => {
@@ -127,14 +124,14 @@ app.use(serverError); //500 error when something throws an error
 
 
 module.exports = {
-    server: app,
-    start: PORT => {
-      if (!PORT) { throw new Error('No PORT here'); }
-      app.listen(PORT, () => {
-        console.log(`super connected ${PORT}`);
-      });
-    },
-  };
+  server: app,
+  start: PORT => {
+    if (!PORT) { throw new Error('No PORT here'); }
+    app.listen(PORT, () => {
+      console.log(`super connected ${PORT}`);
+    });
+  },
+};
 
 
 // let server = require('http').createServer(app);
@@ -143,5 +140,109 @@ module.exports = {
 // io.on('connection', (socket) => {
 //     console.log('a user connected');
 //   });
+
+
+function callBackHandler(req, res, next) {
+  res.status(200).send('Hello World');
+}
+//JPJ - This sill get all the documents in the database
+async function getAll() {
+  return SimpleCounter.find()
+    .then((data) => data)
+    .catch(e => { console.log(`Error Found: ${e}`) });
+}
+//Add a document entry for a desired date and countnumber TODO: add an update to this document
+async function addDailyTotalData(desDate, count) {
+  let entryDate = new Date();
+  entryDate = desDate;
+  SimpleCounter.create({
+    date: entryDate,
+    numberCount: count
+  }, function (err) {
+    if (err) return handleError(err);
+    console.log('Entry Saved');
+  });
+}
+// Prints out all the documents in the database as a console.log
+async function printAllDbData() {
+  let dbase = await getAll();
+  dbase.forEach(i => {
+    let formattedDate = `${i.date.getMonth()}/${i.date.getDate()}/${i.date.getFullYear()}`;
+    console.log(`Date: ${formattedDate} Count: ${i.numberCount}`);
+    console.log(`Full Format ${i.date}}`);
+  });
+}
+
+//TODO: get it to actually search.  Perhaps change the schema to date and count.
+//
+//  const counterSchema = new mongoose.Schema({      
+//  date: {type: Date, require: false},
+//  numberCount: {type: Number, require: false},  
+//});
+// Would make it easier to scan non nested documents.
+async function bombTheDatabase() {
+  await SimpleCounter.deleteMany({});
+  await seedDatabase();
+
+  console.log('Database Slicked and Seeded');
+}
+async function findDbDocument(searchDate) {
+  let countNum = 200;
+  console.log(`Date to search: ${searchDate}`);
+  console.log(`CountNumber: ${countNum}`);
+  let data = await SimpleCounter.findOne({ date: searchDate }).exec();
+  console.log(data);
+  //will return null if no record found.  
+  return data;
+}
+async function seedDatabase() {
+  let dateArr = ['5/28/2021', '5/29/2021', '5/30/2021', '5/31/2021'];
+  let counter = 5;
+  dateArr.forEach(d => addDailyTotalData(d, counter += 5));
+}
+
+//This will determine if there is a record for the updated totals.  if true it will add to the total already stored.  if false it will create a new record and add the counter then reset it.
+async function updateDailyTotals() {
+  let date = new Date();
+  let dateString = `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+  console.log(dateString);
+  //TODO: find a more eloquent way to search for just the date
+  let record = await findDbDocument(dateString);
+  if (record === null) {
+    console.log("No Record Exists.  Creating a new record and updating totals.");
+    addDailyTotalData(dateString, counter);
+
+  }
+  else {
+    let totalCount = counter + record.numberCount;
+    console.log(`Aggregate total going into document: counter: ${counter} recordCount: ${record.numberCount} = ${totalCount}`);
+    console.log(`Updating the following ${record.date} using id: ${record.id}`);
+
+    await SimpleCounter.findByIdAndUpdate(record._id, {
+      date: Date.parse(dateString),
+      numberCount: record.numberCount + counter
+    });
+  }
+  counter = 0;
+}
+
+
+
+//Execution lines
+
+
+printAllDbData();
+
+//addDailyTotalData('5/29/2021');
+//let searchDate = new Date('5/30/2021');
+//bombTheDatabase();
+//counter = 20;
+//console.log(`Counter: ${counter}`);
+
+//updateDailyTotals();
+//console.log(`Counter: ${counter}`);
+//findDbDocument(searchDate);
+
+
 
 
