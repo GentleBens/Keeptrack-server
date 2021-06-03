@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
-let server = require('http').createServer(app);
+//let server = require('http').createServer(app);
 //let io = require('socket.io')(server);
 //httpServer.listen(process.env.PORT) 
 
@@ -26,8 +26,8 @@ const notFound = require('./error-handlers/404');
 const serverError = require('./error-handlers/500');
 const apiRoutes = require('./routes/apiRoutes.js');
 const logger = require('./middleware/logger');
-const { Console } = require('console');
-const { findByIdAndUpdate } = require('./models/counter');
+// const { Console } = require('console');
+// const { findByIdAndUpdate } = require('./models/counter');
 
 //app middleware
 app.use(cors());
