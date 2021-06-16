@@ -6,7 +6,7 @@ const cors = require('cors'); //allow cors
 const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
 const mongoose = require('mongoose');
-const Counter = mongoose.model('counter');
+//const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
 //let server = require('http').createServer(app);
@@ -68,25 +68,25 @@ app.use(logger);   // console.log() routes and methods
 // console.log(doesTableExist(21));
 
 
-async function getAll() {
-  return Counter.find()
-    .then((data) => data)
-    .catch(e => { console.log(e) });
-}
+// async function getAll() {
+//   return Counter.find()
+//     .then((data) => data)
+//     .catch(e => { console.log(e) });
+// }
 
-async function printData(desiredDate) {
-  let dbase = await getAll();
-  //console.log(dbase[0]);
-  for (let i = 0; i < dbase.length; i++) {
-    let dbaseDate = dbase[i].dailyTotal.date.getDate();
-    if (desiredDate === dbaseDate) {
-      console.log('found it');
-      return true;
-    }
-  }
-  console.log('no find it');
-  return false;
-}
+// async function printData(desiredDate) {
+//   let dbase = await getAll();
+//   //console.log(dbase[0]);
+//   for (let i = 0; i < dbase.length; i++) {
+//     let dbaseDate = dbase[i].dailyTotal.date.getDate();
+//     if (desiredDate === dbaseDate) {
+//       console.log('found it');
+//       return true;
+//     }
+//   }
+//   console.log('no find it');
+//   return false;
+// }
 // add to socket.io server
 //let counter = 0;
 // io.on('connection', (socket) => {
