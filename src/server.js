@@ -6,6 +6,8 @@ const cors = require('cors'); //allow cors
 const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
 const mongoose = require('mongoose');
+
+
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
@@ -130,6 +132,7 @@ module.exports = {
     app.listen(PORT, () => {
       console.log(`super connected ${PORT}`);
     });
+
   },
 };
 
