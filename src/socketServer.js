@@ -23,11 +23,14 @@ module.exports = {
     io.on('connection', (socket) => {
       console.log('User Connected');
     
-      socket.on('SendTest', (data) => {
-        console.log('Recieved Emit from client.  Sending response');
+      socket.on('action', (data) => {
+        console.log('Received Emit from client.  Sending response');
         //console.log(`${socket.username} ${socket.message}`);
-        socket.broadcast.emit('DoTest');
-        socket.emit('DoTest');
+        if (data.type === 'server/increment'){
+          console.log('increment received', data.obj);
+          // socket.broadcast.emit('action', {type:'increment', data:'10'});
+          // socket.emit('DoTest');
+        }
       });
     
     });
