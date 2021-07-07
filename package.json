@@ -24,6 +24,7 @@
     "http": "^0.0.1-security",
     "mongoose": "^5.12.9",
     "morgan": "^1.10.0",
+    "nodemon": "^2.0.9",
     "socket.io": "^4.1.1"
   }
 }
