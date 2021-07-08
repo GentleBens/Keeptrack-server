@@ -1,5 +1,6 @@
 'use strict';
 
+const io = require('socket.io-client');
 const express = require('express'); //express server
 const app = express();
 const cors = require('cors'); //allow cors
@@ -7,7 +8,20 @@ const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
 const mongoose = require('mongoose');
 
+//Server needs to be a client of the Socket Server as well
+let socket = io('http://localhost:3050');
+let socketId;
+socket.on("connect", () => {
+  console.log(`Server Socket Client ID: ${socket.id}`); // ojIckSD2jqNzOqIrAGzL
+  socketId = socket.id;    
+});
+socket.on("sendClientInfo",() => {  
+  let infoData = {ID: socket.id, NAME: 'CounterServer'};
+  console.log('Server: Sending ClientInfo: ' + infoData);  
+  socket.emit('userinfo', infoData);
+});
 
+//
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
@@ -42,6 +56,8 @@ app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
 
 
+
+//#region 
 // app.get('/counter', (req, res) => {
 //  console.log('counter response', req.query);
 //  let output = {
@@ -108,7 +124,7 @@ app.use(logger);   // console.log() routes and methods
 //     socket.emit('decrement', { counter: counter });
 //   })
 // })
-
+// //#endregion
 
 
 //proof of life
