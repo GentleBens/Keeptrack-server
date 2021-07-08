@@ -18,7 +18,7 @@ router.delete('/:id', handleDelete);
 async function handleGetAll(req, res) {
   console.log('made it in the get all function');
   try {
-    console.log('this is the request', req);
+    //console.log('this is the request', req);
     let allClicks = await counter.get();
     res.status(200).json(allClicks);
  } catch (e) {

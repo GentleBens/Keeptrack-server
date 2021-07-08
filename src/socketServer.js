@@ -5,7 +5,16 @@ const cors = require('cors'); //allow cors
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:19006", //for testing local
+    //origin: "https://parent-pickup-coordinator.netlify.app/", //for deployment
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+  });
+
 
 app.use(cors());
 
@@ -14,25 +23,43 @@ app.use(express.urlencoded({ extended: true }));
 
 module.exports = {
     server: server,
-    start: SOCKETPORT => {
-        server.listen(3050, () => {
-            console.log('listening on localHost:3050');
-          });
-        },
-    };
+    start: SOCKETPORT => {server.listen(3050, () => {
+          console.log('SocketIO Server listening on localHost:3050');
+        })
+    }
+  }
+      
+    let currentUsers = [];
     io.on('connection', (socket) => {
-      console.log('User Connected');
-    
+      console.log(`User Connected. ID: ${socket.id}`);
       socket.on('action', (data) => {
-        console.log('Received Emit from client.  Sending response');
+        console.log(`SOCKETIO Server: Received Emit from client: ${data.type}. Sending response`);
         //console.log(`${socket.username} ${socket.message}`);
         if (data.type === 'server/increment'){
           console.log('increment received', data.obj);
           // socket.broadcast.emit('action', {type:'increment', data:'10'});
           // socket.emit('DoTest');
+        }        
+      });        
+      socket.on('userinfo', (data) =>{
+        console.log('recieved user info from client');
+        console.log(`ID: ${data.ID} Name: ${data.NAME}`);
+        if(!currentUsers.find(e => data.ID === e.ID)){
+                    currentUsers.push(data);
         }
+        //{ID: socket.id, PORT: socket.PORT, NAME: 'CounterServer'};
+        currentUsers.forEach(element => {
+          console.log(`Current Users: ${element.ID} ${element.NAME}`);          
+        });
+        console.log(`Total Users: ${currentUsers.length}`);
       });
-    
+      setTimeout(()=>{
+        console.log('emitting');
+        socket.broadcast.emit('sendClientInfo');
+      },5);
+    });
+    io.on('disconnect', (socket) => {
+      console.log(`CLient ID: ${socket.id} disconected`);
     });
 
 
