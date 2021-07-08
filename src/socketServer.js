@@ -35,8 +35,10 @@ module.exports = {
       socket.on('action', (data) => {
         console.log(`SOCKETIO Server: Received Emit from client: ${data.type}. Sending response`);
         //console.log(`${socket.username} ${socket.message}`);
-        if (data.type === 'server/increment'){
-          console.log('increment received', data.obj);
+        if (data.type === 'server/totalUpdate'){
+          console.log(`Client ID: ${socket.id}Total Value: ${data.obj}`);
+          socket.broadcast.emit('updateCounter', {total: data.obj});
+
           // socket.broadcast.emit('action', {type:'increment', data:'10'});
           // socket.emit('DoTest');
         }        
@@ -53,13 +55,14 @@ module.exports = {
         });
         console.log(`Total Users: ${currentUsers.length}`);
       });
+      
       setTimeout(()=>{
-        console.log('emitting');
-        socket.broadcast.emit('sendClientInfo');
+        console.log('SocketServer: Requesting Client Information');
+        io.to(socket.id).emit('sendClientInfo');
       },5);
     });
     io.on('disconnect', (socket) => {
-      console.log(`CLient ID: ${socket.id} disconected`);
+      console.log(`CLient ID: ${socket.id} disconnected`);
     });
 
 

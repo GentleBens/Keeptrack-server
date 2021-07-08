@@ -15,19 +15,20 @@ socket.on("connect", () => {
   console.log(`Server Socket Client ID: ${socket.id}`); // ojIckSD2jqNzOqIrAGzL
   socketId = socket.id;    
 });
-socket.on("sendClientInfo",() => {  
+socket.on("sendClientInfo",() => {
+  
   let infoData = {ID: socket.id, NAME: 'CounterServer'};
   console.log('Server: Sending ClientInfo: ' + infoData);  
   socket.emit('userinfo', infoData);
 });
-
-//
+socket.on('updateCounter', (data) => {
+  counter += data.total;
+  console.log(`COUNTER SERVER: Updated counter to ${counter}`);
+})
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
-//let server = require('http').createServer(app);
-//let io = require('socket.io')(server);
-//httpServer.listen(process.env.PORT) 
+
 
 //keep track of how many times a bouncer clicks button
 var counter = 0;
@@ -57,7 +58,7 @@ app.use(logger);   // console.log() routes and methods
 
 
 
-//#region 
+// #region 
 // app.get('/counter', (req, res) => {
 //  console.log('counter response', req.query);
 //  let output = {
@@ -124,7 +125,7 @@ app.use(logger);   // console.log() routes and methods
 //     socket.emit('decrement', { counter: counter });
 //   })
 // })
-// //#endregion
+//#endregion
 
 
 //proof of life
@@ -139,8 +140,6 @@ function callBackHandler(req, res, next) {
 app.use('*', notFound); //404 not found if we don't hit our route
 app.use(serverError); //500 error when something throws an error
 
-
-
 module.exports = {
   server: app,
   start: PORT => {
@@ -148,7 +147,6 @@ module.exports = {
     app.listen(PORT, () => {
       console.log(`super connected ${PORT}`);
     });
-
   },
 };
 
@@ -219,9 +217,8 @@ async function seedDatabase() {
   let counter = 5;
   dateArr.forEach(d => addDailyTotalData(d, counter += 5));
 }
-
 //This will determine if there is a record for the updated totals.  if true it will add to the total already stored.  if false it will create a new record and add the counter then reset it.
-async function updateDailyTotals() {
+async function updateDailyTotals(clientCount) {
   let date = new Date();
   let dateString = `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
   console.log(dateString);
