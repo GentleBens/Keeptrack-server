@@ -59,7 +59,7 @@ module.exports = {
         io.to(socket.id).emit('sendClientInfo');
       },5);
       socket.on('UpdateTotalsOnAllClients', (data) => {
-        console.log('SOCKET SERVER: Emitting SyncTotalCounter');
+        console.log('SOCKETIO SERVER: Emitting SyncTotalCounter');
         socket.broadcast.emit('SyncTotalCounter', {totalCount: data.totalCount});
       });
     });
