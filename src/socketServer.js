@@ -30,8 +30,7 @@ module.exports = {
   }
       
     let currentUsers = [];
-    io.on('connection', (socket) => {
-      io.sockets()
+    io.on('connection', (socket) => {      
       console.log(`User Connected. ID: ${socket.id}`);
       socket.on('action', (data) => {
         console.log(`SOCKETIO Server: Received Emit from client: ${data.type}. Sending response`);
@@ -53,11 +52,16 @@ module.exports = {
         });
         console.log(`Total Users: ${currentUsers.length}`);
       });
+      //socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
       
       setTimeout(()=>{
         console.log('SocketServer: Requesting Client Information');
         io.to(socket.id).emit('sendClientInfo');
       },5);
+      socket.on('UpdateTotalsOnAllClients', (data) => {
+        console.log('SOCKET SERVER: Emitting SyncTotalCounter');
+        socket.broadcast.emit('SyncTotalCounter', {totalCount: data.totalCount});
+      });
     });
     io.on('disconnect', (socket) => {
       console.log(`Client ID: ${socket.id} disconnected`);

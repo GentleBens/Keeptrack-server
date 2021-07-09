@@ -24,6 +24,8 @@ socket.on("sendClientInfo",() => {
 socket.on('updateCounter', (data) => {
   counter += data.total;
   console.log(`COUNTER SERVER: Updated counter to ${counter}`);
+  console.log('Sent Emit to \'UpdateTotalsOnAllClients\'');
+  socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
 })
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
