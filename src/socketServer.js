@@ -31,6 +31,7 @@ module.exports = {
       
     let currentUsers = [];
     io.on('connection', (socket) => {
+      io.sockets()
       console.log(`User Connected. ID: ${socket.id}`);
       socket.on('action', (data) => {
         console.log(`SOCKETIO Server: Received Emit from client: ${data.type}. Sending response`);
@@ -38,9 +39,6 @@ module.exports = {
         if (data.type === 'server/totalUpdate'){
           console.log(`Client ID: ${socket.id}Total Value: ${data.obj}`);
           socket.broadcast.emit('updateCounter', {total: data.obj});
-
-          // socket.broadcast.emit('action', {type:'increment', data:'10'});
-          // socket.emit('DoTest');
         }        
       });        
       socket.on('userinfo', (data) =>{
@@ -62,7 +60,10 @@ module.exports = {
       },5);
     });
     io.on('disconnect', (socket) => {
-      console.log(`CLient ID: ${socket.id} disconnected`);
+      console.log(`Client ID: ${socket.id} disconnected`);
+      let index = currentUsers.findIndex(e => {e.ID === sockect.id});
+      currentUsers.slice(index);
+      console.log('Client Removed from Current Users List');      
     });
 
 
