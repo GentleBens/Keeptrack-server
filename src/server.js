@@ -168,6 +168,7 @@ async function updateDailyTotals(clientCount) {
       numberCount: record.numberCount + counter
     });
   }
+  socket.emit('updateCounter', totalCount);
   counter = 0;
 }
 
