@@ -24,6 +24,8 @@ socket.on("sendClientInfo",() => {
 socket.on('updateCounter', (data) => {
   counter += data.total;
   console.log(`COUNTER SERVER: Updated counter to ${counter}`);
+  console.log('Sent Emit to \'UpdateTotalsOnAllClients\'');
+  socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
 })
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
@@ -33,10 +35,7 @@ const SimpleCounter = mongoose.model('simpleCounter');
 //keep track of how many times a bouncer clicks button
 var counter = 0;
 console.log('inside the server page counter', counter);
-//var socket = io.connect();
-// track
-//var dailyTotal = 0; 
-// update
+
 
 // middleware
 const notFound = require('./error-handlers/404');
@@ -56,76 +55,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
 
-
-
-// #region 
-// app.get('/counter', (req, res) => {
-//  console.log('counter response', req.query);
-//  let output = {
-//    counter: req.query.
-//  }
-//  res.status(200).json(output)
-// });
-
-// determine if table exist for current date if not make a new table for that date
-// let doesTableExist = async (desiredDate) => {
-
-//  //let currentDate = new Date();
-//   // let daily = dailyTotal.date.getDate();
-
-//   let allRecords = await Counter.find().exec() // everything in db
-//     for(let i = 0; i < allRecords.length; i++) {
-
-//       if(desiredDate === allRecords[i].dailyTotal.date.getDate())
-//       console.log('Record located');
-//       return true;
-//     } 
-//     return false;
-//   // if(daily === currentDate.getDate())
-//   // console.log('Daily total date', {currentDate})
-// };
-// console.log(doesTableExist(21));
-
-
-// async function getAll() {
-//   return Counter.find()
-//     .then((data) => data)
-//     .catch(e => { console.log(e) });
-// }
-
-// async function printData(desiredDate) {
-//   let dbase = await getAll();
-//   //console.log(dbase[0]);
-//   for (let i = 0; i < dbase.length; i++) {
-//     let dbaseDate = dbase[i].dailyTotal.date.getDate();
-//     if (desiredDate === dbaseDate) {
-//       console.log('found it');
-//       return true;
-//     }
-//   }
-//   console.log('no find it');
-//   return false;
-// }
-// add to socket.io server
-//let counter = 0;
-// io.on('connection', (socket) => {
-//   console.log('A bouncer connected:');
-//   socket.emit('connection', { counter: counter });
-
-//   socket.on('disconnect', () => {
-//     console.log('Disconnected: ' + socket); //socket.id
-//   });
-
-//   socket.on('increment', (data) => {
-//     counter++;
-//     socket.emit('increment', { counter: counter });
-//   });
-//   socket.on('decrement', (data) => {
-//     counter--;
-//     socket.emit('decrement', { counter: counter });
-//   })
-// })
-//#endregion
 
 
 //proof of life
