@@ -16,16 +16,15 @@ socket.on("connect", () => {
   socketId = socket.id;    
 });
 socket.on("sendClientInfo",() => {
-  
+
   let infoData = {ID: socket.id, NAME: 'CounterServer'};
   console.log('Server: Sending ClientInfo: ' + infoData);  
   socket.emit('userinfo', infoData);
 });
 socket.on('updateCounter', (data) => {
-  counter += data.total;
-  console.log(`COUNTER SERVER: Updated counter to ${counter}`);
-  console.log('Sent Emit to \'UpdateTotalsOnAllClients\'');
-  socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
+let sendCount = updateDailyTotals(data.total);
+console.log('Server: updated Client Totals ', data);
+socket.emit('updateClientTotals', sendCount);
 })
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
@@ -42,6 +41,7 @@ const notFound = require('./error-handlers/404');
 const serverError = require('./error-handlers/500');
 const apiRoutes = require('./routes/apiRoutes.js');
 const logger = require('./middleware/logger');
+
 // const { Console } = require('console');
 // const { findByIdAndUpdate } = require('./models/counter');
 
@@ -105,7 +105,7 @@ async function addDailyTotalData(desDate, count) {
     date: entryDate,
     numberCount: count
   }, function (err) {
-    if (err) return handleError(err);
+    if (err) return 'Error';
     console.log('Entry Saved');
   });
 }
@@ -150,26 +150,29 @@ async function seedDatabase() {
 async function updateDailyTotals(clientCount) {
   let date = new Date();
   let dateString = `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+  let returnCount = 0;
   console.log(dateString);
+
   //TODO: find a more eloquent way to search for just the date
   let record = await findDbDocument(dateString);
   if (record === null) {
     console.log("No Record Exists.  Creating a new record and updating totals.");
-    addDailyTotalData(dateString, counter);
+    returnCount = counter;
+    addDailyTotalData(dateString, returnCount);
 
   }
   else {
-    let totalCount = counter + record.numberCount;
-    console.log(`Aggregate total going into document: counter: ${counter} recordCount: ${record.numberCount} = ${totalCount}`);
+    returnCount = counter + record.numberCount;
+    console.log(`Aggregate total going into document: counter: ${counter} recordCount: ${record.numberCount} = ${returnCount}`);
     console.log(`Updating the following ${record.date} using id: ${record.id}`);
 
     await SimpleCounter.findByIdAndUpdate(record._id, {
       date: Date.parse(dateString),
-      numberCount: record.numberCount + counter
+      numberCount: returnCount
     });
   }
-  socket.emit('updateCounter', totalCount);
   counter = 0;
+  return returnCount;
 }
 
 
