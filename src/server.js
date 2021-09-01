@@ -13,18 +13,18 @@ let socket = io('http://localhost:3050');
 let socketId;
 socket.on("connect", () => {
   console.log(`Server Socket Client ID: ${socket.id}`); // ojIckSD2jqNzOqIrAGzL
-  socketId = socket.id;    
+  socketId = socket.id;
 });
-socket.on("sendClientInfo",() => {
+socket.on("sendClientInfo", () => {
 
-  let infoData = {ID: socket.id, NAME: 'CounterServer'};
-  console.log('Server: Sending ClientInfo: ' + infoData);  
+  let infoData = { ID: socket.id, NAME: 'CounterServer' };
+  console.log('Server: Sending ClientInfo: ' + infoData);
   socket.emit('userinfo', infoData);
 });
-socket.on('updateCounter', (data) => {
-let sendCount = updateDailyTotals(data.total);
-console.log('Server: updated Client Totals ', data);
-socket.emit('updateClientTotals', sendCount);
+socket.on('updateCounter', async (data) => {
+  let sendCount = await updateDailyTotals(data.total);
+  console.log('Server: updated Client Totals: data:', data, 'sendCount: ', sendCount);
+  socket.emit('updateAllClientTotals', { totalCount: sendCount });
 })
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
@@ -148,22 +148,24 @@ async function seedDatabase() {
 }
 //This will determine if there is a record for the updated totals.  if true it will add to the total already stored.  if false it will create a new record and add the counter then reset it.
 async function updateDailyTotals(clientCount) {
+  console.log('ClientCount: ', clientCount);
   let date = new Date();
   let dateString = `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
   let returnCount = 0;
-  console.log(dateString);
+  console.log('updateDailyTotals datestring: ', dateString);
 
   //TODO: find a more eloquent way to search for just the date
   let record = await findDbDocument(dateString);
+  console.log('retreived record: ', record);
   if (record === null) {
-    console.log("No Record Exists.  Creating a new record and updating totals.");
-    returnCount = counter;
+    returnCount = clientCount;
     addDailyTotalData(dateString, returnCount);
+    console.log(`No Record Exists.  Creating a new record and updating totals`);
 
   }
   else {
-    returnCount = counter + record.numberCount;
-    console.log(`Aggregate total going into document: counter: ${counter} recordCount: ${record.numberCount} = ${returnCount}`);
+    returnCount = clientCount + record.numberCount;
+    console.log(`Aggregate total going into document: counter: ${clientCount} recordCount: ${record.numberCount} = ${returnCount}`);
     console.log(`Updating the following ${record.date} using id: ${record.id}`);
 
     await SimpleCounter.findByIdAndUpdate(record._id, {
@@ -171,7 +173,7 @@ async function updateDailyTotals(clientCount) {
       numberCount: returnCount
     });
   }
-  counter = 0;
+  //counter = 0;
   return returnCount;
 }
 
