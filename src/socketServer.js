@@ -65,7 +65,7 @@ module.exports = {
     });
     io.on('disconnect', (socket) => {
       console.log(`Client ID: ${socket.id} disconnected`);
-      let index = currentUsers.findIndex(e => {e.ID === sockect.id});
+      let index = currentUsers.findIndex(e => {e.ID === socket.id});
       currentUsers.slice(index);
       console.log('Client Removed from Current Users List');      
     });
