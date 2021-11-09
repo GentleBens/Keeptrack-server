@@ -7,26 +7,28 @@ const cors = require('cors'); //allow cors
 const morgan = require('morgan'); //helps with middleware
 require('./models/counter');
 const mongoose = require('mongoose');
+const socketServer = require('./socketServer.js')
+
 
 //Server needs to be a client of the Socket Server as well
-let socket = io('http://localhost:3050');
-let socketId;
-socket.on("connect", () => {
-  console.log(`Server Socket Client ID: ${socket.id}`); // ojIckSD2jqNzOqIrAGzL
-  socketId = socket.id;    
-});
-socket.on("sendClientInfo",() => {
-  
-  let infoData = {ID: socket.id, NAME: 'CounterServer'};
-  console.log('Server: Sending ClientInfo: ' + infoData);  
-  socket.emit('userinfo', infoData);
-});
-socket.on('updateCounter', (data) => {
-  counter += data.total;
-  console.log(`COUNTER SERVER: Updated counter to ${counter}`);
-  console.log('Sent Emit to \'UpdateTotalsOnAllClients\'');
-  socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
-})
+// let socket = io('http://localhost:3050');
+// let socketId;
+// socket.on("connect", () => {
+//   console.log(`Server Socket Client ID: ${socket.id}`); // ojIckSD2jqNzOqIrAGzL
+//   socketId = socket.id;    
+// });
+// socket.on("sendClientInfo",() => {
+
+//   let infoData = {ID: socket.id, NAME: 'CounterServer'};
+//   console.log('Server: Sending ClientInfo: ' + infoData);  
+//   socket.emit('userinfo', infoData);
+// });
+// socket.on('updateCounter', (data) => {
+//   counter += data.total;
+//   console.log(`COUNTER SERVER: Updated counter to ${counter}`);
+//   console.log('Sent Emit to \'UpdateTotalsOnAllClients\'');
+//   socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
+// })
 //const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
@@ -71,11 +73,13 @@ app.use(serverError); //500 error when something throws an error
 
 module.exports = {
   server: app,
-  start: PORT => {
+  start: (PORT, SOCKETPORT) => {
     if (!PORT) { throw new Error('No PORT here'); }
     app.listen(PORT, () => {
-      console.log(`super connected ${PORT}`);
+      console.log(`Express Server Connected: ${PORT}`);
     });
+    socketServer.start(SOCKETPORT)
+
   },
 };
 

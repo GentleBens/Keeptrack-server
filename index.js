@@ -7,6 +7,6 @@ const server = require('./src/server.js');
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOOSE_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-socketServer.start(process.env.SOCKETPORT);
-server.start(process.env.PORT);
+// socketServer.start(process.env.SOCKETPORT);
+server.start(process.env.PORT, process.env.SOCKETPORT);
 

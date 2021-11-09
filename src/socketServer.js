@@ -13,62 +13,82 @@ const io = new Server(server, {
     allowedHeaders: ["my-custom-header"],
     credentials: true
   }
-  });
+});
+// app.use(cors());
 
-
-app.use(cors());
-
-app.use(express.json());  //turns the req.body into json
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());  //turns the req.body into json
+// app.use(express.urlencoded({ extended: true }));
 
 module.exports = {
-    server: server,
-    start: SOCKETPORT => {server.listen(3050, () => {
-          console.log('SocketIO Server listening on localHost:3050');
-        })
-    }
+  server: server,
+  start: SOCKETPORT => {
+    server.listen(SOCKETPORT, () => {
+      console.log('SocketIO Server listening on localHost:3050');
+    })
   }
-      
-    let currentUsers = [];
-    io.on('connection', (socket) => {      
-      console.log(`User Connected. ID: ${socket.id}`);
-      socket.on('action', (data) => {
-        console.log(`SOCKETIO Server: Received Emit from client: ${data.type}. Sending response`);
-        //console.log(`${socket.username} ${socket.message}`);
-        if (data.type === 'server/totalUpdate'){
-          console.log(`Client ID: ${socket.id}Total Value: ${data.obj}`);
-          socket.broadcast.emit('updateCounter', {total: data.obj});
-        }        
-      });        
-      socket.on('userinfo', (data) =>{
-        console.log('recieved user info from client');
-        console.log(`ID: ${data.ID} Name: ${data.NAME}`);
-        if(!currentUsers.find(e => data.ID === e.ID)){
-                    currentUsers.push(data);
-        }
-        //{ID: socket.id, PORT: socket.PORT, NAME: 'CounterServer'};
-        currentUsers.forEach(element => {
-          console.log(`Current Users: ${element.ID} ${element.NAME}`);          
-        });
-        console.log(`Total Users: ${currentUsers.length}`);
-      });
-      //socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
-      
-      setTimeout(()=>{
-        console.log('SocketServer: Requesting Client Information');
-        io.to(socket.id).emit('sendClientInfo');
-      },5);
-      socket.on('UpdateTotalsOnAllClients', (data) => {
-        console.log('SOCKETIO SERVER: Emitting SyncTotalCounter');
-        socket.broadcast.emit('SyncTotalCounter', {totalCount: data.totalCount});
-      });
-    });
-    io.on('disconnect', (socket) => {
-      console.log(`Client ID: ${socket.id} disconnected`);
-      let index = currentUsers.findIndex(e => {e.ID === socket.id});
-      currentUsers.slice(index);
-      console.log('Client Removed from Current Users List');      
-    });
+}
+
+let currentUsers = [];
+io.on('connection', (socket) => {
+  //Initial Connection
+  console.log(`User Connected. ID: ${socket.id}`);
+  currentUsers.push({ id: socket.id, socket: socket });
+  console.log('Number Clients -->', currentUsers.length);
+  //(event, args, call back for response);
+
+  let updatedArr = currentUsers.reduce((acc, curObj) => {
+    console.log(curObj.id, curObj.socket.connected);
+    if (curObj.socket.connected) acc.push(curObj);
+    else {
+      console.log('\nremoving id', curObj.id, '\n');
+      curObj.socket.disconnect(true);
+    }
+    return acc;
+  }, []);
+  console.log('updatedArr', updatedArr.length);
+
+
+
+  socket.emit('sendClientInfo', socket.id, (data) => console.log('reply:', data))
+  //Event Listeners
+  //   socket.on('action', (data) => {
+  //     //data = {type: obj: 0} <-type: action/message        
+
+  //     if (data.type === 'server/totalUpdate') {
+  //       console.log(`Client ID: ${socket.id}Total Value: ${data.obj}`);
+  //       socket.broadcast.emit('updateCounter', { total: data.obj });
+  //     }
+  //   });
+  //   socket.on('userinfo', (data) => {
+  //     console.log('recieved user info from client');
+  //     console.log(`ID: ${data.ID} Name: ${data.NAME}`);
+  //     if (!currentUsers.find(e => data.ID === e.ID)) {
+  //       currentUsers.push(data);
+  //     }
+  //     //{ID: socket.id, PORT: socket.PORT, NAME: 'CounterServer'};
+  //     currentUsers.forEach(element => {
+  //       console.log(`Current Users: ${element.ID} ${element.NAME}`);
+  //     });
+  //     console.log(`Total Users: ${currentUsers.length}`);
+  //   });
+  //   //socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
+
+  //   setTimeout(() => {
+  //     console.log('SocketServer: Requesting Client Information');
+  //     io.to(socket.id).emit('sendClientInfo');
+  //   }, 5);
+  //   socket.on('UpdateTotalsOnAllClients', (data) => {
+  //     console.log('SOCKETIO SERVER: Emitting SyncTotalCounter');
+  //     socket.broadcast.emit('SyncTotalCounter', { totalCount: data.totalCount });
+  //   });
+});
+io.on('disconnect', (socket) => {
+  console.log(`Client ID: ${socket.id} disconnected`);
+  let index = currentUsers.findIndex(e => { e.ID === socket.id });
+  currentUsers.slice(index);
+  console.log('Client Removed from Current Users List');
+});
+
 
 
 
