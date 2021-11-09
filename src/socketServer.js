@@ -20,10 +20,9 @@ const io = new Server(server, {
 // app.use(express.urlencoded({ extended: true }));
 
 module.exports = {
-  server: server,
   start: SOCKETPORT => {
     server.listen(SOCKETPORT, () => {
-      console.log('SocketIO Server listening on localHost:3050');
+      console.log(`(2/3) SocketIO Server: ${SOCKETPORT}`);
     })
   }
 }
@@ -50,6 +49,10 @@ io.on('connection', (socket) => {
 
 
   socket.emit('sendClientInfo', socket.id, (data) => console.log('reply:', data))
+  socket.on('sendServerRequestClientCount', (data, func) => {
+    console.log('recieved sendServerRequestClient');
+    func(`Recieved Data ${data}`);
+  })
   //Event Listeners
   //   socket.on('action', (data) => {
   //     //data = {type: obj: 0} <-type: action/message        

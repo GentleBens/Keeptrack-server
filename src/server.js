@@ -9,27 +9,6 @@ require('./models/counter');
 const mongoose = require('mongoose');
 const socketServer = require('./socketServer.js')
 
-
-//Server needs to be a client of the Socket Server as well
-// let socket = io('http://localhost:3050');
-// let socketId;
-// socket.on("connect", () => {
-//   console.log(`Server Socket Client ID: ${socket.id}`); // ojIckSD2jqNzOqIrAGzL
-//   socketId = socket.id;    
-// });
-// socket.on("sendClientInfo",() => {
-
-//   let infoData = {ID: socket.id, NAME: 'CounterServer'};
-//   console.log('Server: Sending ClientInfo: ' + infoData);  
-//   socket.emit('userinfo', infoData);
-// });
-// socket.on('updateCounter', (data) => {
-//   counter += data.total;
-//   console.log(`COUNTER SERVER: Updated counter to ${counter}`);
-//   console.log('Sent Emit to \'UpdateTotalsOnAllClients\'');
-//   socket.emit('UpdateTotalsOnAllClients', {totalCount: counter});
-// })
-//const Counter = mongoose.model('counter');
 const SimpleCounter = mongoose.model('simpleCounter');
 
 
@@ -57,8 +36,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
 
-
-
 //proof of life
 app.get('/alive', callBackHandler);
 
@@ -76,7 +53,7 @@ module.exports = {
   start: (PORT, SOCKETPORT) => {
     if (!PORT) { throw new Error('No PORT here'); }
     app.listen(PORT, () => {
-      console.log(`Express Server Connected: ${PORT}`);
+      console.log(`(1/3) Express Server: ${PORT}`);
     });
     socketServer.start(SOCKETPORT)
 
