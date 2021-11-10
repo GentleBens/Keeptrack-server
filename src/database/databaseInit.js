@@ -6,7 +6,11 @@ const DataCollections = require('./dataCollections.js');
 const collectionActions = new DataCollections();
 
 const start = () => {
-  mongoose.connect(process.env.MONGOOSE_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  mongoose.connect(process.env.MONGOOSE_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  });
   const db = mongoose.connection;
   db.on('error', console.error.bind(console, 'conection error: '));
   db.once('open', async () => {

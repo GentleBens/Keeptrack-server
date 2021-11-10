@@ -4,8 +4,6 @@ const express = require('express');
 const router = express.Router();
 const Collection = require('../database/dataCollections');
 const counter = new Collection();
-const SimpleCounter = mongoose.model('simpleCounter');
-
 
 console.log('made it to the apiRoutes page');
 console.log('this is the collection', Collection);
@@ -13,24 +11,9 @@ console.log('this is the counter', counter);
 
 router.get('/', handleGetAll);
 router.get('/:id', handleGetOne);
-router.get('/clearandseed', clearAndSeed);
 router.post('/', handleAdd);
 router.put('/:id', handleUpdate);
 router.delete('/:id', handleDelete);
-
-async function clearAndSeed(req, res) {
-  console.log('route hit');
-  await SimpleCounter, deleteMany({});
-  let dateArr = ['5/28/2021', '5/29/2021', '5/30/2021', '5/31/2021'];
-  let counter = 5;
-  dateArr.forEach(async date => {
-    await SimpleCounter.create({
-      date: new Date(date),
-      counter: counter += 5
-    });
-  })
-}
-
 async function handleGetAll(req, res) {
   console.log('made it in the get all function');
   try {
