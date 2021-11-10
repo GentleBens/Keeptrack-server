@@ -1,9 +1,11 @@
 'use strict';
-
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Collection = require('../database/dataCollections');
 const counter = new Collection();
+const SimpleCounter = mongoose.model('simpleCounter');
+
 
 console.log('made it to the apiRoutes page');
 console.log('this is the collection', Collection);
@@ -11,14 +13,27 @@ console.log('this is the counter', counter);
 
 router.get('/', handleGetAll);
 router.get('/:id', handleGetOne);
+router.get('/clearandseed', clearAndSeed);
 router.post('/', handleAdd);
 router.put('/:id', handleUpdate);
 router.delete('/:id', handleDelete);
 
+async function clearAndSeed(req, res) {
+  console.log('route hit');
+  await SimpleCounter, deleteMany({});
+  let dateArr = ['5/28/2021', '5/29/2021', '5/30/2021', '5/31/2021'];
+  let counter = 5;
+  dateArr.forEach(async date => {
+    await SimpleCounter.create({
+      date: new Date(date),
+      counter: counter += 5
+    });
+  })
+}
+
 async function handleGetAll(req, res) {
   console.log('made it in the get all function');
   try {
-    //console.log('this is the request', req);
     let allClicks = await counter.get();
     res.status(200).json(allClicks);
   } catch (e) {
@@ -27,7 +42,7 @@ async function handleGetAll(req, res) {
 }
 async function handleGetOne(req, res) {
   try {
-    console.log('this is the request', req);
+    console.log('this is GET one request');
     const id = req.params.id;
     let oneClick = await counter.get(id)
     res.status(200).json(oneClick);
@@ -37,7 +52,7 @@ async function handleGetOne(req, res) {
 }
 async function handleAdd(req, res) {
   try {
-    console.log('this is the request', req);
+    console.log('this is the POST request', req.body);
     let obj = req.body;
     let addNewClick = await counter.create(obj);
     res.status(201).json(addNewClick);

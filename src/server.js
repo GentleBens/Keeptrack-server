@@ -9,8 +9,6 @@ require('./database/counterModel');
 const mongoose = require('mongoose');
 const socketServer = require('./socketServer.js')
 
-const SimpleCounter = mongoose.model('simpleCounter');
-
 
 
 //keep track of how many times a bouncer clicks button
@@ -23,6 +21,8 @@ const notFound = require('./error-handlers/404');
 const serverError = require('./error-handlers/500');
 const apiRoutes = require('./routes/apiRoutes.js');
 const logger = require('./middleware/logger');
+const DataCollections = require('./database/dataCollections.js');
+const dataCollection = new DataCollections();
 // const { Console } = require('console');
 // const { findByIdAndUpdate } = require('./models/counter');
 
@@ -33,20 +33,17 @@ app.use(morgan('dev'));
 app.use(express.json());  //turns the req.body into json
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/clearandseed', (req, res) => dataCollection.clearAndSeed())
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
 
 //proof of life
-app.get('/alive', callBackHandler);
-
-function callBackHandler(req, res, next) {
-  res.status(200).send('Hello World');
-}
-
+app.get('/alive', (req, res) => res.status(200).send('Yes, I am alive'));
 
 //error handlers
 app.use('*', notFound); //404 not found if we don't hit our route
 app.use(serverError); //500 error when something throws an error
+
 
 module.exports = {
   server: app,
@@ -56,28 +53,12 @@ module.exports = {
       console.log(`(1/3) Express Server: ${PORT}`);
     });
     socketServer.start(SOCKETPORT)
-
   },
 };
 
 
-// let server = require('http').createServer(app);
-// const { Server } = require("socket.io");
-// const io = new Server(server);
-// io.on('connection', (socket) => {
-//     console.log('a user connected');
-//   });
 
 
-function callBackHandler(req, res, next) {
-  res.status(200).send('Hello World');
-}
-//JPJ - This sill get all the documents in the database
-async function getAll() {
-  return SimpleCounter.find()
-    .then((data) => data)
-    .catch(e => { console.log(`Error Found: ${e}`) });
-}
 //Add a document entry for a desired date and countnumber TODO: add an update to this document
 async function addDailyTotalData(desDate, count) {
   let entryDate = new Date();
@@ -90,15 +71,6 @@ async function addDailyTotalData(desDate, count) {
     console.log('Entry Saved');
   });
 }
-// Prints out all the documents in the database as a console.log
-async function printAllDbData() {
-  let dbase = await getAll();
-  dbase.forEach(i => {
-    let formattedDate = `${i.date.getMonth()}/${i.date.getDate()}/${i.date.getFullYear()}`;
-    console.log(`Date: ${formattedDate} Count: ${i.numberCount}`);
-    console.log(`Full Format ${i.date}}`);
-  });
-}
 
 //TODO: get it to actually search.  Perhaps change the schema to date and count.
 //
@@ -107,12 +79,7 @@ async function printAllDbData() {
 //  numberCount: {type: Number, require: false},  
 //});
 // Would make it easier to scan non nested documents.
-async function bombTheDatabase() {
-  await SimpleCounter.deleteMany({});
-  await seedDatabase();
 
-  console.log('Database Slicked and Seeded');
-}
 async function findDbDocument(searchDate) {
   let countNum = 200;
   console.log(`Date to search: ${searchDate}`);
@@ -158,17 +125,6 @@ async function updateDailyTotals(clientCount) {
 //Execution lines
 
 
-printAllDbData();
-
-//addDailyTotalData('5/29/2021');
-//let searchDate = new Date('5/30/2021');
-//bombTheDatabase();
-//counter = 20;
-//console.log(`Counter: ${counter}`);
-
-//updateDailyTotals();
-//console.log(`Counter: ${counter}`);
-//findDbDocument(searchDate);
 
 
 
