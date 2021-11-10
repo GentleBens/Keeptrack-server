@@ -22,6 +22,22 @@ class DataCollections {
   update(_id, record) {
     return this.model.findByIdAndUpdate(_id, record, { new: true });
   }
+  //Entries in Range for Chart use
+  async getDateRange(rangeObj) {
+    console.log('[Collections] getDateRange');
+
+    console.log('[Collections]:', rangeObj.startDate.getMonth());
+    let { startDate, endDate } = rangeObj;
+
+    let docs = await this.model.find({
+      date: {
+        $gte: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()),
+        $lt: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1)
+      }
+    });
+    console.log(`[Collections] docs ${docs}`);
+    return docs;
+  }
   async syncClientTotal(clientCount) {
     let document = await retrieveCurrentDataDoc(new Date());
     if (document) {

@@ -32,8 +32,20 @@ app.get('/clearandseed', (req, res) => {
 app.use('/counter', apiRoutes);  // all my routes
 app.use(logger);   // console.log() routes and methods
 
-//proof of life
+//Test Routes
 app.get('/alive', (req, res) => res.status(200).send('Yes, I am alive'));
+app.post('/range', async (req, res) => {
+  let start = new Date(req.body.start);
+  let end = new Date(req.body.end);
+  let rangeDocs = await dataCollection.getDateRange(
+    {
+      startDate: start,
+      endDate: end
+    }
+  );
+  res.status(200).send(rangeDocs);
+});
+
 
 //error handlers
 app.use('*', notFound); //404 not found if we don't hit our route
