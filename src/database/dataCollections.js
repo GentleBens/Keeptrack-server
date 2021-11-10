@@ -1,16 +1,16 @@
 'use strict';
-const model = require('./counter');
+const model = require('./counterModel');
 
 class DataCollections {
   constructor() {
     this.model = model;
   }
-  get(_id) {
+  async get(_id) {
     if (_id) {
-      return this.model.findOne({ _id });
+      return await this.model.findOne({ _id });
     }
     else {
-      return this.model.find({});
+      return await this.model.find({});
     }
   }
   create(record) {

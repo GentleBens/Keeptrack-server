@@ -14,6 +14,8 @@ const io = new Server(server, {
     credentials: true
   }
 });
+const mongoose = require('mongoose');
+const Counter = mongoose.model('simpleCounter');
 // app.use(cors());
 
 // app.use(express.json());  //turns the req.body into json
@@ -52,6 +54,15 @@ io.on('connection', (socket) => {
   socket.on('sendServerRequestClientCount', (data, func) => {
     console.log('recieved sendServerRequestClient');
     func(`Recieved Data ${data}`);
+  });
+
+  socket.on('action', (action) => {
+    let request = action.type.split('/');
+    switch (request[1]) {
+      case 'syncWithServer':
+        console.log('syncingWithServer');
+        break;
+    }
   })
   //Event Listeners
   //   socket.on('action', (data) => {

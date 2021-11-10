@@ -5,7 +5,7 @@ const express = require('express'); //express server
 const app = express();
 const cors = require('cors'); //allow cors
 const morgan = require('morgan'); //helps with middleware
-require('./models/counter');
+require('./database/counterModel');
 const mongoose = require('mongoose');
 const socketServer = require('./socketServer.js')
 
