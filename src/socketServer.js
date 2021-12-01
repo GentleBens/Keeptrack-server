@@ -66,7 +66,7 @@ async function handleSocketAction(action, socket) {
       let updatedCount = (await dataCollection.syncClientTotal(action.clientCount)).numberCount;
       print(`New Updated Count: ${updatedCount}`);
       print('Emitting Updated Count to all Clients');
-      socket.emit(`serverUpdatedCount ${updatedCount}`);
+      socket.emit(`serverUpdatedCount`, updatedCount);
       break;
     default:
       print()
