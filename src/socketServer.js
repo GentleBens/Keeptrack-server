@@ -49,6 +49,7 @@ io.on('connection', (socket) => {
     func(`Recieved Data ${data}`);
   });
   socket.on('action', (action) => handleSocketAction(action, socket));
+
 });
 io.on('disconnect', (socket) => {
   print(`Client ID: ${socket.id} disconnected`);
@@ -67,6 +68,21 @@ async function handleSocketAction(action, socket) {
       print(`New Updated Count: ${updatedCount}`);
       print('Emitting Updated Count to all Clients');
       socket.emit(`serverUpdatedCount`, updatedCount);
+      break;
+    case 'getDataRange':
+      console.log("ClientAction: ", action.dataRange);
+      let dataRange = await dataCollection.getDateRange(action.dataRange);
+      console.log('[Collections] DataRange:', dataRange);
+      let formattedData = dataRange.map(d => {
+
+        return {
+
+          group: `${d.date.getMonth() + 1}/${d.date.getDate()}/${d.date.getFullYear()}`,
+          value: d.numberCount
+        }
+      });
+      console.log('[Collections] Formatted Data: ', formattedData);
+      socket.emit(`requestedDataRangeFromServer`, formattedData);
       break;
     default:
       print()

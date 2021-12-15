@@ -25,9 +25,10 @@ class DataCollections {
   //Entries in Range for Chart use
   async getDateRange(rangeObj) {
     console.log('[Collections] getDateRange');
-
-    console.log('[Collections]:', rangeObj.startDate.getMonth());
-    let { startDate, endDate } = rangeObj;
+    console.log('[Collections] rangeObj: ', rangeObj)
+    let startDate = new Date(rangeObj.startDate);
+    let endDate = new Date(rangeObj.endDate);
+    console.log('[Collections]:', rangeObj.startDate);
 
     let docs = await this.model.find({
       date: {
