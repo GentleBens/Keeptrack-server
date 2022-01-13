@@ -64,7 +64,7 @@ class DataCollections {
   }
   async clearAndSeed() {
     await this.model.deleteMany({});
-    let dateArr = ['5/28/2021', '11/09/2021', '5/30/2021', '5/31/2021'];
+    let dateArr = ['01/12/2022', '01/13/2022', '01/14/2022', '01/15/2022', '01/16/2022', '01/17/2022', '01/18/2022', '01/19/2022', '01/20/2022'];
     let counter = 5;
     dateArr.forEach(async date => {
       await this.model.create({
