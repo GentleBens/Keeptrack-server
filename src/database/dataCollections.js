@@ -24,10 +24,11 @@ class DataCollections {
   }
   //Entries in Range for Chart use
   async getDateRange(rangeObj) {
-    console.log('[Collections] getDateRange');
-
-    console.log('[Collections]:', rangeObj.startDate.getMonth());
-    let { startDate, endDate } = rangeObj;
+    //console.log('[Collections] getDateRange');
+    console.log('[Collections] rangeObj: ', rangeObj)
+    let startDate = new Date(rangeObj.startDate);
+    let endDate = new Date(rangeObj.endDate);
+    //console.log('[Collections]:', rangeObj.startDate);
 
     let docs = await this.model.find({
       date: {
@@ -35,7 +36,7 @@ class DataCollections {
         $lt: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1)
       }
     });
-    console.log(`[Collections] docs ${docs}`);
+    console.log(`[Collections] Docs in DateRange: ${docs}`);
     return docs;
   }
   async syncClientTotal(clientCount) {
@@ -63,7 +64,7 @@ class DataCollections {
   }
   async clearAndSeed() {
     await this.model.deleteMany({});
-    let dateArr = ['5/28/2021', '11/09/2021', '5/30/2021', '5/31/2021'];
+    let dateArr = ['01/12/2022', '01/13/2022', '01/14/2022', '01/15/2022', '01/16/2022', '01/17/2022', '01/18/2022', '01/19/2022', '01/20/2022'];
     let counter = 5;
     dateArr.forEach(async date => {
       await this.model.create({

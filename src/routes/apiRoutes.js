@@ -14,6 +14,7 @@ router.get('/:id', handleGetOne);
 router.post('/', handleAdd);
 router.put('/:id', handleUpdate);
 router.delete('/:id', handleDelete);
+
 async function handleGetAll(req, res) {
   console.log('made it in the get all function');
   try {

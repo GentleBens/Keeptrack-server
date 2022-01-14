@@ -18,6 +18,7 @@ const start = () => {
     let getCollLength = await collectionActions.get();
     console.log('\tStartup Server Count:', getCollLength.length);
   });
+  //collectionActions.clearAndSeed();
 }
 
 module.exports = {
