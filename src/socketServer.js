@@ -69,12 +69,12 @@ async function handleSocketAction(action, socket) {
       print('Emitting Updated Count to all Clients');
       socket.emit(`serverUpdatedCount`, updatedCount);
       break;
+    //Get a customized array of date start/end
     case 'getDataRange':
       console.log("ClientAction: ", action.dataRange);
       let dataRange = await dataCollection.getDateRange(action.dataRange);
       console.log('[Collections] DataRange:', dataRange);
       let formattedData = dataRange.map(d => {
-
         return {
 
           group: `${d.date.getMonth() + 1}/${d.date.getDate()}/${d.date.getFullYear()}`,
@@ -84,12 +84,37 @@ async function handleSocketAction(action, socket) {
       console.log('[Collections] Formatted Data: ', formattedData);
       socket.emit(`requestedDataRangeFromServer`, formattedData);
       break;
+    //get an object of day, week, and month data for chartDisplay
+
+    case 'getHistoricalData':
+      console.log("Getting Historical Data");
+      let currentDate = new Date();
+      let startDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+      let weekEnd = `${currentDate.getMonth() + 1}/${currentDate.getDate() + 7}/${currentDate.getFullYear()}`;
+      let monthEnd = `${currentDate.getMonth() + 2}/${currentDate.getDate() + 7}/${currentDate.getFullYear()}`;
+
+      console.log(`Dates: startDate: ${startDate} weekEnd: ${weekEnd} monthEnd: ${monthEnd}`);
+
+      let dayData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: startDate }));
+      let weekData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: weekEnd }));
+      let monthData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: monthEnd }));
+
+      let dataToSend = { day: dayData, week: weekData, month: monthData }
+      socket.emit(`requestedChartDataFromServer`, dataToSend);
+      break;
     default:
       print()
       break;
   }
 }
-
+function formatDocumentArray(arr) {
+  return arr.map(d => {
+    return {
+      group: `${d.date.getMonth() + 1}/${d.date.getDate()}/${d.date.getFullYear()}`,
+      value: d.numberCount
+    }
+  });
+}
 function print(str) {
   console.log(`[Socket Server] ${str}`);
 }
