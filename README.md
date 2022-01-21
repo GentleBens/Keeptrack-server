@@ -8,14 +8,11 @@ PORT=3000
 
 - [Keeptrack-gentlebens](https://keeptrack-gentlebens.herokuapp.com/)
 
-## Deployed Socket.io Server
-
-- []()
-
 ## Deployed React Native Frontend
 
 - [Expo go Project](https://expo.io/@stacyjane/keeptrack-gentlebens)
 
-Contributions:
+Developed By:
 
+[Stacy Burris](https://github.com/stacyburris)
 [JP Jones](https://github.com/4a50)
