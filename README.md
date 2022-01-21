@@ -14,5 +14,5 @@ PORT=3000
 
 Developed By:
 
-[Stacy Burris](https://github.com/stacyburris)
-[JP Jones](https://github.com/4a50)
+- [Stacy Burris](https://github.com/stacyburris)
+- [JP Jones](https://github.com/4a50)
