@@ -36,8 +36,10 @@ class DataCollections {
         $lt: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1)
       }
     });
-    console.log(`[Collections] Docs in DateRange: ${docs}`);
-    return docs;
+    let sortedRange = docs.sort((a, b) => a.date - b.date);
+    console.log("sortedRecords:", sortedRange);
+    console.log(`[Collections] Docs in DateRange: ${sortedRange}`);
+    return sortedRange;
   }
   async syncClientTotal(clientCount) {
     let document = await retrieveCurrentDataDoc(new Date());
@@ -64,7 +66,11 @@ class DataCollections {
   }
   async clearAndSeed() {
     await this.model.deleteMany({});
-    let dateArr = ['01/12/2022', '01/13/2022', '01/14/2022', '01/15/2022', '01/16/2022', '01/17/2022', '01/18/2022', '01/19/2022', '01/20/2022'];
+    let dateArr = [];
+    let startDay = 19;
+    for (let i = 0; i < 11; i++) {
+      dateArr.push(`01/${startDay + i}/2022`);
+    }
     let counter = 5;
     dateArr.forEach(async date => {
       await this.model.create({
@@ -82,8 +88,8 @@ let retrieveCurrentDataDoc = async (date) => {
       $lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
     }
   });
-  return record ? record : null;
 
+  return record ? record : null;
 }
 
 
