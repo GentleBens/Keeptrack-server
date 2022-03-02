@@ -67,7 +67,7 @@ class DataCollections {
   async clearAndSeed() {
     await this.model.deleteMany({});
     let dateArr = [];
-    let startDay = 19;
+    let startDay = 17;
     for (let i = 0; i < 11; i++) {
       dateArr.push(`01/${startDay + i}/2022`);
     }

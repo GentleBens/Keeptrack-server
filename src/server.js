@@ -25,6 +25,10 @@ app.use(morgan('dev'));
 app.use(express.json());  //turns the req.body into json
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+  apiRoutes.handleGetAll(req, res);
+})
+
 app.get('/clearandseed', (req, res) => {
   dataCollection.clearAndSeed();
   res.status(200).send('Cleared and Seeded');
