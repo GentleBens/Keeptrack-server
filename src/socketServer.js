@@ -108,12 +108,13 @@ async function handleSocketAction(action, socket) {
   }
 }
 function formatDocumentArray(arr) {
-  return arr.map(d => {
-    return {
-      group: `${d.date.getMonth() + 1}/${d.date.getDate()}/${d.date.getFullYear()}`,
-      value: d.numberCount
-    }
+  let labelArr = [];
+  let countValues = [];
+  arr.forEach(d => {
+    lableArr.push(`${d.date.getMonth() + 1}/${d.date.getDate()}/${d.date.getFullYear()}`);
+    countValues.push(d.numberCount);
   });
+  return { labels: labelArr, countValue: countValues }
 }
 function print(str) {
   console.log(`[Socket Server] ${str}`);
