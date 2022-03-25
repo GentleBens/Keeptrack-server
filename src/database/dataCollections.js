@@ -24,12 +24,8 @@ class DataCollections {
   }
   //Entries in Range for Chart use
   async getDateRange(rangeObj) {
-    //console.log('[Collections] getDateRange');
-    console.log('[Collections] rangeObj: ', rangeObj)
     let startDate = new Date(rangeObj.startDate);
     let endDate = new Date(rangeObj.endDate);
-    //console.log('[Collections]:', rangeObj.startDate);
-
     let docs = await this.model.find({
       date: {
         $gte: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()),
@@ -37,8 +33,6 @@ class DataCollections {
       }
     });
     let sortedRange = docs.sort((a, b) => a.date - b.date);
-    console.log("sortedRecords:", sortedRange);
-    console.log(`[Collections] Docs in DateRange: ${sortedRange}`);
     return sortedRange;
   }
   async syncClientTotal(clientCount) {

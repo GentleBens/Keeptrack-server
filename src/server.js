@@ -34,7 +34,7 @@ app.get('/clearandseed', (req, res) => {
   res.status(200).send('Cleared and Seeded');
 })
 app.use('/counter', apiRoutes);  // all my routes
-app.use(logger);   // console.log() routes and methods
+app.use(logger);   // routes and methods
 
 //Test Routes
 app.get('/alive', (req, res) => res.status(200).send('Yes, I am alive'));
