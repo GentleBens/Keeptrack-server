@@ -1,6 +1,6 @@
 'use strict'
 var currentUsers = [];
-
+const moment = require('moment');
 const express = require('express'); //express server
 const app = express();
 const http = require('http');
@@ -78,15 +78,17 @@ async function handleSocketAction(action, socket) {
       });
       socket.emit(`requestedDataRangeFromServer`, formattedData);
       break;
-    //get an object of day, week, and month data for chartDisplay
+    //get an object of day, week, and month data for chartDisplay using moment wrapper npm package
     case 'getHistoricalData':
-      let currentDate = new Date();
-      let startDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
-      let weekEnd = `${currentDate.getMonth() + 1}/${currentDate.getDate() + 7}/${currentDate.getFullYear()}`;
-      let monthEnd = `${currentDate.getMonth() + 2}/${currentDate.getDate() + 7}/${currentDate.getFullYear()}`;
-      let dayData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: startDate }));
-      let weekData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: weekEnd }));
-      let monthData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: monthEnd }));
+      let startDate = moment(new Date());
+      let daily = startDate.clone().add(1, "day").format("LL");
+      let monthly = startDate.clone().add(-1, "month").format("LL");
+      let yearly = startDate.clone().add(-1, "year").format("LL");
+      console.log("Daily: ", daily);
+      let dayData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: daily }));
+      let weekData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: monthly }));
+      let monthData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: yearly }));
+
 
       let dataToSend = { day: dayData, week: weekData, month: monthData }
       socket.emit(`requestedChartDataFromServer`, dataToSend);
