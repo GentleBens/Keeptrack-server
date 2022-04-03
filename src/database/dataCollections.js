@@ -1,5 +1,6 @@
 'use strict';
 const model = require('./counterModel');
+const moment = require('moment');
 //Schema
 // date: { type: Date, require: true },
 // numberCount: { type: Number, require: false }
@@ -59,19 +60,33 @@ class DataCollections {
     return this.model.findByIdAndDelete(_id);
   }
   async clearAndSeed() {
+    //Clear all data in DB
     await this.model.deleteMany({});
     let dateArr = [];
-    let startDay = 17;
-    for (let i = 0; i < 11; i++) {
-      dateArr.push(`01/${startDay + i}/2022`);
-    }
-    let counter = 5;
-    dateArr.forEach(async date => {
+    let startDate = moment(new Date());
+    console.log(startDate.format("LLL"));
+    startDate.add(1, 'd');
+    console.log(startDate.format("LLL"));
+    let dte = startDate.toDate();
+    console.log(dte);
+    for (let i = 1; i <= 180; i++) {
+      let currentDate = startDate.clone();
+      currentDate.add(i * -1, 'd');
+      dateArr.push(currentDate.toDate());
+      let randCount = Math.floor(Math.random() * (200 - 50) + 50);
       await this.model.create({
-        date: new Date(date),
-        numberCount: counter += 5
+        date: currentDate.toDate(),
+        numberCount: randCount
       });
-    })
+    }
+
+    // let counter = 5;
+    // dateArr.forEach(async date => {
+    //   await this.model.create({
+    //     date: new Date(date),
+    //     numberCount: counter += 5
+    //   });
+    // })
   }
 }
 
