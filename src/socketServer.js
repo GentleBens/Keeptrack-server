@@ -80,15 +80,15 @@ async function handleSocketAction(action, socket) {
       break;
     //get an object of day, week, and month data for chartDisplay using moment wrapper npm package
     case 'getHistoricalData':
-      let startDate = moment(new Date());
-      let daily = startDate.clone().add(1, "day").format("LL");
-      let monthly = startDate.clone().add(-1, "month").format("LL");
-      let yearly = startDate.clone().add(-1, "year").format("LL");
-      console.log("Daily: ", daily);
-      let dayData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: daily }));
-      let weekData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: monthly }));
-      let monthData = formatDocumentArray(await dataCollection.getDateRange({ startDate, endDate: yearly }));
-
+      let currentDate = moment(new Date());
+      let daily = currentDate.clone().add(1, "day").format("LL");
+      let weekly = currentDate.clone().add(-6, "day").format("LL");
+      let monthly = currentDate.clone().add(-29, "day").format("LL");
+      console.log("Daily: ", daily, "weekly: ", weekly, "monthly: ", monthly);
+      let dayData = formatDocumentArray(await dataCollection.getDateRange({ startDate: currentDate, endDate: daily }));
+      let weekData = formatDocumentArray(await dataCollection.getDateRange({ startDate: weekly, endDate: currentDate }));
+      let monthData = formatDocumentArray(await dataCollection.getDateRange({ startDate: monthly, endDate: currentDate }));
+      console.log("DAY", dayData, "WEEK", weekData, "MONTH", monthData);
 
       let dataToSend = { day: dayData, week: weekData, month: monthData }
       socket.emit(`requestedChartDataFromServer`, dataToSend);
