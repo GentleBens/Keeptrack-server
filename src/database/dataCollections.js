@@ -1,9 +1,7 @@
 'use strict';
 const model = require('./counterModel');
 const moment = require('moment');
-//Schema
-// date: { type: Date, require: true },
-// numberCount: { type: Number, require: false }
+
 class DataCollections {
   constructor() {
     this.model = model;
