@@ -12,13 +12,12 @@ const start = () => {
     useFindAndModify: false
   });
   const db = mongoose.connection;
-  db.on('error', console.error.bind(console, 'conection error: '));
+  db.on('error', console.error.bind(console, 'connection error: '));
   db.once('open', async () => {
     console.log('(3/3) MongoDB Connected');
     let getCollLength = await collectionActions.get();
     console.log('\tStartup Server Count:', getCollLength.length);
   });
-  //collectionActions.clearAndSeed();
 }
 
 module.exports = {
